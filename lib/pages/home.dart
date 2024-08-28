@@ -8,15 +8,18 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  bool isVisible = false;
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    double type = MediaQuery.sizeOf(context).width > 780 ? 500 : 100;
-    String email = "";
-
-    return const Scaffold(
-      body: Column(),
-    );
+    return Scaffold(body: Center());
   }
 }

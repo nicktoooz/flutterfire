@@ -52,7 +52,7 @@ class _SignInState extends State<SignIn> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const Image(image: AssetImage('flutter.png')),
+                  const Image(image: AssetImage('assets/flutter.png')),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[

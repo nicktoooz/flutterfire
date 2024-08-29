@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutterfire/app_database.dart';
+import 'package:flutterfire/user.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -38,6 +40,50 @@ class _SignInState extends State<SignIn> {
     _usernameFocusNode.dispose();
     _passwordFocusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> _signIn() async {
+    setState(() {
+      _usernameError = "";
+      _passwordError = "";
+    });
+
+    // Validate inputs
+    if (_usernameController.text.isEmpty) {
+      setState(() {
+        _usernameError = "Username cannot be empty";
+      });
+      return;
+    } else if (_usernameController.text.length < 8) {
+      setState(() {
+        _usernameError = "Username must have at least 8 characters";
+      });
+      return;
+    }
+    if (_passwordController.text.isEmpty) {
+      setState(() {
+        _passwordError = "Password cannot be empty";
+      });
+      return;
+    } else if (_passwordController.text.length < 8) {
+      setState(() {
+        _passwordError = "Password must have at least 8 characters";
+      });
+      return;
+    }
+
+    final uid = DateTime.now().millisecondsSinceEpoch.toString();
+
+    try {
+      await signUpUser(uid, _usernameController.text, _passwordController.text);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('User signed up with UID: $uid')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error signing up user: $e')),
+      );
+    }
   }
 
   @override
@@ -165,28 +211,7 @@ class _SignInState extends State<SignIn> {
                         fontSize: 18,
                         fontFamily: 'Poppins',
                       )),
-                      onPressed: () {
-                        if (_usernameController.text.isEmpty) {
-                          setState(() {
-                            _usernameError = "Username cannot be empty";
-                          });
-                        } else if (_usernameController.text.length < 8) {
-                          setState(() {
-                            _usernameError =
-                                "Username must have at least 8 characters";
-                          });
-                        }
-                        if (_passwordController.text.isEmpty) {
-                          setState(() {
-                            _passwordError = "Password cannot be empty";
-                          });
-                        } else if (_passwordController.text.length < 8) {
-                          setState(() {
-                            _passwordError =
-                                "Password must have at least 8 characters";
-                          });
-                        }
-                      },
+                      onPressed: _signIn,
                       child: const Text(
                         'Sign In',
                       ),
@@ -203,7 +228,9 @@ class _SignInState extends State<SignIn> {
                         fontSize: 18,
                         fontFamily: 'Poppins',
                       )),
-                      onPressed: () {},
+                      onPressed: () {
+                        // Handle Register button press
+                      },
                       child: const Text('Register'),
                     ),
                   ),
@@ -214,5 +241,21 @@ class _SignInState extends State<SignIn> {
         ),
       ),
     );
+  }
+}
+
+Future<void> signUpUser(String uid, String email, String password) async {
+  final appDatabase = AppDatabase.instance;
+
+  final newUser = User(
+    uid: uid,
+    email: email,
+    password: password,
+  );
+
+  try {
+    await appDatabase.signUp(newUser);
+  } catch (e) {
+    throw Exception('Error signing up user: $e');
   }
 }
